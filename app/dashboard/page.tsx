@@ -1,5 +1,5 @@
 import React from 'react';
-import Navbar from '../componentes/navbar';
+import Navbar from '../../ui/navbar';
 
 function dashboard() {
     return (
