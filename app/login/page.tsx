@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
-import { FaUser, FaLock, FaEye, FaEyeSlash } from 'react-icons/fa';
+import React from 'react';
+import { FaUser, FaLock} from 'react-icons/fa';
 import { FcWorkflow } from 'react-icons/fc';
 import Link from 'next/link';
 
