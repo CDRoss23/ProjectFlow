@@ -7,9 +7,9 @@ export default function ProjectFlow() {
         <h1 className="text-xl font-semibold">ProjectFlow</h1>
         <div>
           <Link href="/login">
-            <button className="mr-4"><a className="mr-4">Login</a></button>
+            <button className="mr-4">Login</button>
           </Link>
-          <Link href="/login">
+          <Link href="/register">
             <button className="bg-white text-black px-4 py-2 rounded-lg font-medium">Registrate </button>
           </Link>
         </div>

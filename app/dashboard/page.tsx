@@ -1,5 +1,5 @@
 import React from 'react';
-import Navbar from '../componentes/navbar';
+import Sliderbar from '../componentes/sliderbar';
 
 // Datos estáticos de ejemplo
 const datosDashboard = {
@@ -12,7 +12,7 @@ const datosDashboard = {
 function Dashboard() {
 return (
 <div className="min-h-screen bg-gradient-to-b from-black to-gray-900 text-white flex flex-col items-center px-6">
-    <Navbar />
+    <Sliderbar />
     
     {/* Título del Dashboard */}
     <h1 className="text-4xl font-bold mt-8 mb-6">Dashboard de Personal</h1>

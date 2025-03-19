@@ -5,13 +5,13 @@ import Link from 'next/link';
 import { AiOutlineHome, AiOutlineProject, AiOutlineTeam, AiOutlineSetting } from 'react-icons/ai';
 
 
-const Navbar = () => {
+const Sliderbar = () => {
     const [isOpen, setIsOpen] = useState(true);
 
     return (
         <div className={`bg-gray-800 text-white h-screen ${isOpen ? 'w-64' : 'w-20'} transition-all duration-300 fixed left-0 top-0`}>
             <div className="p-4">
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between p-4 border-b border-border">
                     {isOpen && <h2 className="text-xl font-bold">ProjectFlow</h2>}
                     <button
                         onClick={() => setIsOpen(!isOpen)}
@@ -24,9 +24,9 @@ const Navbar = () => {
                 <nav className="mt-8">
                     <ul className="space-y-4">
                         <li>
-                            <Link href="/" className="flex items-center gap-4 p-2 rounded-lg hover:bg-gray-700">
+                            <Link href="/dashboard" className="flex items-center gap-4 p-2 rounded-lg hover:bg-gray-700">
                                 <AiOutlineHome size={24} />
-                                {isOpen && <span>Inicio</span>}
+                                {isOpen && <span>Dashboard</span>}
                             </Link>
                         </li>
                         <li>
@@ -54,4 +54,4 @@ const Navbar = () => {
     );
 };
 
-export default Navbar;
+export default Sliderbar;
