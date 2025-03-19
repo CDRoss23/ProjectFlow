@@ -24,10 +24,11 @@ const Sliderbar = () => {
             { href: '/gerente/gestionar-proyectos', icon: <AiOutlineProject size={24} />, label: 'Gestionar Proyectos' },
             { href: '/gerente/proceso', icon: <AiOutlineTeam size={24} />, label: 'Supervisar Proyecto' },
             { href: '/gerente/comunicacion', icon: <AiOutlineTeam size={24} />, label: 'Comunicacion' },
+            { href: '/gerente/asignar', icon: <AiOutlineTeam size={24} />, label: 'Asignar' },
         ],
         miembro: [
             { href: '/dashboard', icon: <AiOutlineDashboard size={24} />, label: 'Dashboard' },
-            { href: '/miembro/proyectos', icon: <AiOutlineProject size={24} />, label: 'Proyectos' },
+            { href: '/miembro', icon: <AiOutlineProject size={24} />, label: 'Proyectos' },
         ],
     };
 
