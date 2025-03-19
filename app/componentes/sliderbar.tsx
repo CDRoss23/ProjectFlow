@@ -18,6 +18,7 @@ const Sliderbar = () => {
             { href: '/admin/confi-roles', icon: <AiOutlineTeam size={24} />, label: 'Configurar Permisos' },
             { href: '/admin/actividad', icon: <AiOutlineUser size={24} />, label: 'Supervisar Actividad' },
             { href: '/admin/mantenimiento', icon: <AiOutlineSetting size={24} />, label: 'Mantenimiento' },
+            { href: '/', icon: <AiOutlineSetting size={24} />, label: 'Cerrar Sesion' },
         ],
         gerente: [
             { href: '/dashboard', icon: <AiOutlineDashboard size={24} />, label: 'Dashboard' },
@@ -25,10 +26,12 @@ const Sliderbar = () => {
             { href: '/gerente/proceso', icon: <AiOutlineTeam size={24} />, label: 'Supervisar Proyecto' },
             { href: '/gerente/comunicacion', icon: <AiOutlineTeam size={24} />, label: 'Comunicacion' },
             { href: '/gerente/asignar', icon: <AiOutlineTeam size={24} />, label: 'Asignar' },
+            { href: '/', icon: <AiOutlineSetting size={24} />, label: 'Cerrar Sesion' },
         ],
         miembro: [
             { href: '/dashboard', icon: <AiOutlineDashboard size={24} />, label: 'Dashboard' },
             { href: '/miembro', icon: <AiOutlineProject size={24} />, label: 'Proyectos' },
+            { href: '/', icon: <AiOutlineSetting size={24} />, label: 'Cerrar Sesion' },
         ],
     };
 

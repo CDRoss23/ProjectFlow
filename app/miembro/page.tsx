@@ -59,6 +59,8 @@ function Proyectos() {
     const handleDragEnd = (event: any) => {
         const { active, over } = event;
 
+        if (!over) return;
+
         if (active.id !== over.id) {
             setColumns((prevColumns) => {
                 const oldColumn = prevColumns.find((col) =>
@@ -68,27 +70,43 @@ function Proyectos() {
                     col.items.find((item) => item.id === over.id)
                 );
 
-                if (!oldColumn || !newColumn) return prevColumns;
+                if (!oldColumn) return prevColumns;
 
                 const oldItems = oldColumn.items;
-                const newItems = newColumn.items;
-
                 const oldIndex = oldItems.findIndex((item) => item.id === active.id);
-                const newIndex = newItems.findIndex((item) => item.id === over.id);
+                const draggedItem = oldItems[oldIndex];
 
-                const newOldItems = oldItems.filter((item) => item.id !== active.id);
-                const newNewItems = [...newItems];
-                newNewItems.splice(newIndex, 0, oldItems[oldIndex]);
+                // Si es la misma columna
+                if (oldColumn.id === newColumn?.id) {
+                    const newItems = arrayMove(oldItems, oldIndex, oldItems.findIndex((item) => item.id === over.id));
+                    return prevColumns.map((col) => {
+                        if (col.id === oldColumn.id) {
+                            return { ...col, items: newItems };
+                        }
+                        return col;
+                    });
+                }
 
-                return prevColumns.map((col) => {
-                    if (col.id === oldColumn.id) {
-                        return { ...col, items: newOldItems };
-                    }
-                    if (col.id === newColumn.id) {
-                        return { ...col, items: newNewItems };
-                    }
-                    return col;
-                });
+                // Si es una columna diferente
+                if (newColumn) {
+                    const newItems = newColumn.items;
+                    const newIndex = newItems.findIndex((item) => item.id === over.id);
+                    const newNewItems = [...newItems];
+                    newNewItems.splice(newIndex, 0, draggedItem);
+                    const newOldItems = oldItems.filter((item) => item.id !== active.id);
+
+                    return prevColumns.map((col) => {
+                        if (col.id === oldColumn.id) {
+                            return { ...col, items: newOldItems };
+                        }
+                        if (col.id === newColumn.id) {
+                            return { ...col, items: newNewItems };
+                        }
+                        return col;
+                    });
+                }
+
+                return prevColumns;
             });
         }
     };
