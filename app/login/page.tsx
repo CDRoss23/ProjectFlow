@@ -12,7 +12,7 @@ export default function Login() {
   const [error, setError] = useState("");
   const router = useRouter();
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: { preventDefault: () => void; }) => {
     e.preventDefault();
 
     try {
@@ -27,8 +27,24 @@ export default function Login() {
       const data = await response.json();
 
       if (response.ok) {
-        // Redirigir al dashboard o manejar el login exitoso
-        router.push("/dashboard");
+        // Guardar usuario en localStorage o sessionStorage según preferencia
+        localStorage.setItem("usuario", JSON.stringify(data.user)); // O usa sessionStorage si prefieres
+        sessionStorage.setItem("user", JSON.stringify(data.user)); // Si prefieres persistencia temporal en sessionStorage
+
+        // Redirigir según el rol del usuario
+        switch (data.user.rol) {
+          case "admin":
+            router.push("/dashboard");
+            break;
+          case "gerente":
+            router.push("/dashboard");
+            break;
+          case "miembro":
+            router.push("/dashboard");
+            break;
+          default:
+            router.push("/dashboard");
+        }
       } else {
         setError(data.message);
       }
