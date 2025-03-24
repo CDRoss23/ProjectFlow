@@ -1,51 +1,112 @@
-import React from 'react';
-import Sliderbar from '../componentes/sliderbar';
+"use client";
 
-// Datos estáticos de ejemplo
-const datosDashboard = {
-  usuarios: 150,
-  ventas: 3200,
-  productos: 45,
-  ingresos: 12000,
+import React, { useState, useEffect } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import {
+  AiOutlineProject,
+  AiOutlineTeam,
+  AiOutlineSetting,
+  AiOutlineUser,
+  AiOutlineDashboard,
+  AiOutlineLogout,
+} from "react-icons/ai";
+
+const Sidebar = () => {
+  const [isOpen, setIsOpen] = useState(true);
+  const [currentRole, setCurrentRole] = useState<string | null>(null);
+  const router = useRouter();
+
+  // Cargar el rol desde sessionStorage al montar el componente
+  useEffect(() => {
+    const storedUser = JSON.parse(sessionStorage.getItem("user") || "null");
+    if (!storedUser || !storedUser.rol) {
+      router.push("/login"); // Si no hay rol, redirigir a login
+    } else {
+      setCurrentRole(storedUser.rol); // Establecer el rol del usuario
+    }
+  }, [router]);
+
+  const handleLogout = () => {
+    sessionStorage.removeItem("user"); // Eliminar el usuario del sessionStorage
+    router.push("/login"); // Redirigir a login
+  };
+
+  const menuItems = {
+    admin: [
+      { href: "/dashboard", icon: <AiOutlineDashboard size={24} />, label: "Dashboard" },
+      { href: "/admin/gestionar-usuarios", icon: <AiOutlineUser size={24} />, label: "Gestionar Usuarios" },
+      { href: "/admin/confi-roles", icon: <AiOutlineTeam size={24} />, label: "Configurar Permisos" },
+      { href: "/admin/actividad", icon: <AiOutlineUser size={24} />, label: "Supervisar Actividad" },
+      { href: "/admin/mantenimiento", icon: <AiOutlineSetting size={24} />, label: "Mantenimiento" },
+    ],
+    gerente: [
+      { href: "/dashboard", icon: <AiOutlineDashboard size={24} />, label: "Dashboard" },
+      { href: "/gerente/gestionar-proyectos", icon: <AiOutlineProject size={24} />, label: "Gestionar Proyectos" },
+      { href: "/gerente/proceso", icon: <AiOutlineTeam size={24} />, label: "Supervisar Proyecto" },
+      { href: "/gerente/comunicacion", icon: <AiOutlineTeam size={24} />, label: "Comunicación" },
+    ],
+    miembro: [
+      { href: "/dashboard", icon: <AiOutlineDashboard size={24} />, label: "Dashboard" },
+      { href: "/miembro/proyectos", icon: <AiOutlineProject size={24} />, label: "Proyectos" },
+    ],
+  };
+
+  if (!currentRole) return null; // Si no hay rol, no renderiza nada
+
+  // Texto de rol con traducción
+  const roleText = {
+    admin: "Administrador",
+    gerente: "Gerencia",
+    miembro: "Miembro",
+  };
+
+  return (
+    <div className={`bg-gray-800 text-white h-screen ${isOpen ? "w-64" : "w-20"} transition-all duration-300 fixed left-0 top-0`}>
+      <div className="p-4">
+        <div className="flex items-center justify-between p-4 border-b border-gray-600">
+          {isOpen && (
+            <Link href="/" className="flex items-center cursor-pointer">
+              <h1 className="text-2xl font-bold text-white">ProjectFlow</h1>
+            </Link>
+          )}
+          <button onClick={() => setIsOpen(!isOpen)} className="p-2 rounded-lg hover:bg-gray-700">
+            ☰
+          </button>
+        </div>
+
+        {/* Mostrar el rol del usuario con diseño */}
+        {isOpen && currentRole && (
+          <div className="mt-4 text-center border-b border-gray-500 pb-4">
+            <p className="text-white text-lg font-semibold">
+              {roleText[currentRole as keyof typeof roleText]}
+            </p>
+          </div>
+        )}
+
+        <nav className="mt-8">
+          <ul className="space-y-4">
+            {menuItems[currentRole as keyof typeof menuItems].map((item, index) => (
+              <li key={index}>
+                <Link href={item.href} className="flex items-center gap-4 p-2 rounded-lg hover:bg-gray-700">
+                  {item.icon}
+                  {isOpen && <span>{item.label}</span>}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
+
+        {/* Cerrar sesión */}
+        <div className="absolute bottom-4 left-0 w-full">
+          <button onClick={handleLogout} className="flex items-center gap-4 p-2 w-full text-left hover:bg-red-600 rounded-lg">
+            <AiOutlineLogout size={24} />
+            {isOpen && <span>Cerrar Sesión</span>}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 };
 
-function Dashboard() {
-return (
-<div className="min-h-screen bg-gradient-to-b from-black to-gray-900 text-white flex flex-col items-center px-6">
-    <Sliderbar />
-    
-    {/* Título del Dashboard */}
-    <h1 className="text-4xl font-bold mt-8 mb-6">Dashboard de Personal</h1>
-
-    {/* Sección de estadísticas rápidas */}
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 w-full max-w-6xl">
-    <div className="bg-gray-800 p-6 rounded-lg shadow-lg">
-        <h2 className="text-xl font-semibold mb-2">Usuarios</h2>
-        <p className="text-3xl">{datosDashboard.usuarios}</p>
-    </div>
-    <div className="bg-gray-800 p-6 rounded-lg shadow-lg">
-        <h2 className="text-xl font-semibold mb-2">Ventas</h2>
-        <p className="text-3xl">{datosDashboard.ventas}</p>
-    </div>
-    <div className="bg-gray-800 p-6 rounded-lg shadow-lg">
-        <h2 className="text-xl font-semibold mb-2">Productos</h2>
-        <p className="text-3xl">{datosDashboard.productos}</p>
-    </div>
-    <div className="bg-gray-800 p-6 rounded-lg shadow-lg">
-        <h2 className="text-xl font-semibold mb-2">Ingresos</h2>
-        <p className="text-3xl">${datosDashboard.ingresos}</p>
-    </div>
-    </div>
-
-    {/* Sección para gráficos o tablas (puedes expandir esta parte) */}
-    <div className="mt-10 w-full max-w-6xl">
-    <h2 className="text-2xl font-semibold mb-4">Gráficos y Detalles</h2>
-    <div className="bg-gray-800 p-6 rounded-lg shadow-lg">
-        <p>pendiente</p>
-    </div>
-    </div>
-</div>
-);
-}
-
-export default Dashboard;
+export default Sidebar;
