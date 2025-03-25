@@ -125,35 +125,6 @@ export default function ConfiguracionRoles() {
     setEditando(rol.rol);
   };
 
-  const handleEliminar = async (rol: string) => {
-    if (!confirm(`¿Eliminar el rol ${rol}?`)) return;
-    setIsLoading(true);
-    
-    try {
-      const response = await fetch('/api/roles', {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ rol })
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Error al eliminar rol');
-      }
-
-      await cargarDatos();
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError('Error desconocido');
-      }
-      console.error('Error:', err);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   const resetForm = () => {
     setFormData({
       nombreRol: '',
@@ -167,11 +138,11 @@ export default function ConfiguracionRoles() {
     <div className="min-h-screen bg-gradient-to-b from-black to-gray-900 text-white flex flex-col items-center px-6">
       <Sliderbar />
       
-      <h1 className="text-4xl font-bold mt-8 mb-6">Configurar permisos y roles</h1>
+      <h1 className="text-4xl font-bold mt-8 mb-6">Gestión de Permisos y Roles</h1>
       
       <div className="w-full max-w-4xl bg-gray-800 p-6 rounded-lg mb-8">
         <h2 className="text-2xl font-semibold mb-4">
-          {editando ? `Editando Rol: ${editando}` : 'Crear Nuevo Rol'}
+          {editando ? `Editando Permisos del Rol: ${editando}` : 'Asignar Permisos a Rol'}
         </h2>
         {error && <div className="mb-4 p-3 bg-red-700 rounded">{error}</div>}
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -202,7 +173,7 @@ export default function ConfiguracionRoles() {
           </div>
           
           <div>
-            <h3 className="text-xl mb-2">Permisos</h3>
+            <h3 className="text-xl mb-2">Permisos Disponibles</h3>
             <div className="grid grid-cols-2 gap-4">
               {permisosDisponibles.map(permiso => (
                 <div key={permiso.id} className="flex items-center space-x-2">
@@ -228,7 +199,7 @@ export default function ConfiguracionRoles() {
               className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded disabled:opacity-50"
               disabled={isLoading}
             >
-              {isLoading ? 'Procesando...' : editando ? 'Actualizar Rol' : 'Crear Rol'}
+              {isLoading ? 'Procesando...' : editando ? 'Actualizar Permisos' : 'Asignar Permisos'}
             </button>
             {editando && (
               <button 
@@ -245,7 +216,7 @@ export default function ConfiguracionRoles() {
       </div>
 
       <div className="w-full max-w-4xl bg-gray-800 p-6 rounded-lg">
-        <h2 className="text-2xl font-semibold mb-4">Roles Existentes</h2>
+        <h2 className="text-2xl font-semibold mb-4">Roles y sus Permisos</h2>
         {isLoading && roles.length === 0 ? (
           <div className="text-center py-8">Cargando roles...</div>
         ) : error ? (
@@ -259,7 +230,7 @@ export default function ConfiguracionRoles() {
                 <tr className="bg-gray-700">
                   <th className="p-3 text-left">Rol</th>
                   <th className="p-3 text-left">Descripción</th>
-                  <th className="p-3 text-left">Permisos</th>
+                  <th className="p-3 text-left">Permisos Asignados</th>
                   <th className="p-3 text-left">Acciones</th>
                 </tr>
               </thead>
@@ -280,17 +251,10 @@ export default function ConfiguracionRoles() {
                     <td className="p-3">
                       <button 
                         onClick={() => handleEditar(rol)}
-                        className="bg-yellow-600 hover:bg-yellow-700 px-3 py-1 rounded mr-2 disabled:opacity-50"
+                        className="bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded disabled:opacity-50"
                         disabled={isLoading || rol.rol === 'admin'}
                       >
-                        Editar
-                      </button>
-                      <button 
-                        onClick={() => handleEliminar(rol.rol)}
-                        className="bg-red-600 hover:bg-red-700 px-3 py-1 rounded disabled:opacity-50"
-                        disabled={isLoading || rol.rol === 'admin'}
-                      >
-                        Eliminar
+                        Gestionar Permisos
                       </button>
                     </td>
                   </tr>

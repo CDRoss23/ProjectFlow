@@ -12,24 +12,38 @@ import {
   AiOutlineLogout,
 } from "react-icons/ai";
 
+// Definimos un tipo para los roles válidos
+type UserRole = "admin" | "gerente" | "miembro";
+
 const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(true);
-  const [currentRole, setCurrentRole] = useState<string | null>(null);
+  const [currentRole, setCurrentRole] = useState<UserRole | null>(null);
   const router = useRouter();
 
   // Cargar el rol desde sessionStorage al montar el componente
   useEffect(() => {
     const storedUser = JSON.parse(sessionStorage.getItem("user") || "null");
-    if (!storedUser || !storedUser.rol) {
-      router.push("/login"); // Si no hay rol, redirigir a login
+    
+    if (!storedUser?.rol) {
+      router.push("/login");
+      return;
+    }
+
+    // Normalizamos el rol para asegurarnos que coincida con nuestras claves
+    const normalizedRole = storedUser.rol.toLowerCase() as UserRole;
+    
+    // Verificamos si el rol es válido
+    if (["admin", "gerente", "miembro"].includes(normalizedRole)) {
+      setCurrentRole(normalizedRole);
     } else {
-      setCurrentRole(storedUser.rol); // Establecer el rol del usuario
+      console.error("Rol no válido:", storedUser.rol);
+      router.push("/login");
     }
   }, [router]);
 
   const handleLogout = () => {
-    sessionStorage.removeItem("user"); // Eliminar el usuario del sessionStorage
-    router.push("/login"); // Redirigir a login
+    sessionStorage.removeItem("user");
+    router.push("/login");
   };
 
   const menuItems = {
@@ -52,14 +66,19 @@ const Sidebar = () => {
     ],
   };
 
-  if (!currentRole) return null; // Si no hay rol, no renderiza nada
-
-  // Texto de rol con traducción
   const roleText = {
     admin: "Administrador",
-    gerente: "Gerencia",
+    gerente: "Gerente",
     miembro: "Miembro",
   };
+
+  // Si no hay rol o el rol no es válido, no renderizamos
+  if (!currentRole) {
+    return null;
+  }
+
+  // Obtenemos los items del menú de forma segura
+  const currentMenuItems = menuItems[currentRole] || [];
 
   return (
     <div className={`bg-gray-800 text-white h-screen ${isOpen ? "w-64" : "w-20"} transition-all duration-300 fixed left-0 top-0`}>
@@ -70,23 +89,31 @@ const Sidebar = () => {
               <h1 className="text-2xl font-bold text-white">ProjectFlow</h1>
             </Link>
           )}
-          <button onClick={() => setIsOpen(!isOpen)} className="p-2 rounded-lg hover:bg-gray-700">
+          <button 
+            onClick={() => setIsOpen(!isOpen)} 
+            className="p-2 rounded-lg hover:bg-gray-700"
+            aria-label={isOpen ? "Cerrar menú" : "Abrir menú"}
+          >
             ☰
           </button>
         </div>
 
-        {/* Mostrar el rol solo cuando el menú está abierto */}
         {isOpen && currentRole && (
           <div className="mt-4 text-center border-b border-gray-500 pb-4">
-            <p className="text-white text-lg font-semibold">{roleText[currentRole as keyof typeof roleText]}</p>
+            <p className="text-white text-lg font-semibold">
+              {roleText[currentRole]}
+            </p>
           </div>
         )}
 
         <nav className="mt-8">
           <ul className="space-y-4">
-            {menuItems[currentRole as keyof typeof menuItems].map((item, index) => (
+            {currentMenuItems.map((item, index) => (
               <li key={index}>
-                <Link href={item.href} className="flex items-center gap-4 p-2 rounded-lg hover:bg-gray-700">
+                <Link 
+                  href={item.href} 
+                  className="flex items-center gap-4 p-2 rounded-lg hover:bg-gray-700"
+                >
                   {item.icon}
                   {isOpen && <span>{item.label}</span>}
                 </Link>
@@ -95,9 +122,11 @@ const Sidebar = () => {
           </ul>
         </nav>
 
-        {/* Cerrar sesión */}
         <div className="absolute bottom-4 left-0 w-full">
-          <button onClick={handleLogout} className="flex items-center gap-4 p-2 w-full text-left hover:bg-red-600 rounded-lg">
+          <button 
+            onClick={handleLogout} 
+            className="flex items-center gap-4 p-2 w-full text-left hover:bg-red-600 rounded-lg"
+          >
             <AiOutlineLogout size={24} />
             {isOpen && <span>Cerrar Sesión</span>}
           </button>

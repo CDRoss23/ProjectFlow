@@ -17,19 +17,18 @@ const Sidebar = () => {
   const [currentRole, setCurrentRole] = useState<string | null>(null);
   const router = useRouter();
 
-  // Cargar el rol desde sessionStorage al montar el componente
   useEffect(() => {
     const storedUser = JSON.parse(sessionStorage.getItem("user") || "null");
     if (!storedUser || !storedUser.rol) {
-      router.push("/login"); // Si no hay rol, redirigir a login
+      router.push("/login");
     } else {
-      setCurrentRole(storedUser.rol); // Establecer el rol del usuario
+      setCurrentRole(storedUser.rol);
     }
   }, [router]);
 
   const handleLogout = () => {
-    sessionStorage.removeItem("user"); // Eliminar el usuario del sessionStorage
-    router.push("/login"); // Redirigir a login
+    sessionStorage.removeItem("user");
+    router.push("/login");
   };
 
   const menuItems = {
@@ -52,14 +51,16 @@ const Sidebar = () => {
     ],
   };
 
-  if (!currentRole) return null; // Si no hay rol, no renderiza nada
-
-  // Texto de rol con traducción
   const roleText = {
     admin: "Administrador",
     gerente: "Gerencia",
     miembro: "Miembro",
   };
+
+  // Verifica si currentRole es válido
+  if (!currentRole || !menuItems[currentRole as keyof typeof menuItems]) {
+    return null; // No renderiza si el rol no es válido
+  }
 
   return (
     <div className={`bg-gray-800 text-white h-screen ${isOpen ? "w-64" : "w-20"} transition-all duration-300 fixed left-0 top-0`}>
@@ -75,7 +76,6 @@ const Sidebar = () => {
           </button>
         </div>
 
-        {/* Mostrar el rol del usuario con diseño */}
         {isOpen && currentRole && (
           <div className="mt-4 text-center border-b border-gray-500 pb-4">
             <p className="text-white text-lg font-semibold">
@@ -86,7 +86,7 @@ const Sidebar = () => {
 
         <nav className="mt-8">
           <ul className="space-y-4">
-            {menuItems[currentRole as keyof typeof menuItems].map((item, index) => (
+            {menuItems[currentRole as keyof typeof menuItems]?.map((item, index) => (
               <li key={index}>
                 <Link href={item.href} className="flex items-center gap-4 p-2 rounded-lg hover:bg-gray-700">
                   {item.icon}
@@ -97,7 +97,6 @@ const Sidebar = () => {
           </ul>
         </nav>
 
-        {/* Cerrar sesión */}
         <div className="absolute bottom-4 left-0 w-full">
           <button onClick={handleLogout} className="flex items-center gap-4 p-2 w-full text-left hover:bg-red-600 rounded-lg">
             <AiOutlineLogout size={24} />
