@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import pool from '../../lib/db';
 import { logActividad } from '../../lib/logger';
 
+// Manejo de roles
 export async function GET() {
   try {
     const connection = await pool.getConnection();
@@ -32,6 +33,11 @@ export async function GET() {
     return NextResponse.json(rolesConPermisos);
   } catch (error) {
     console.error('Error:', error);
+    await logActividad(
+      'sistema',
+      'Error al obtener roles',
+      error.message
+    );
     return NextResponse.json({ error: 'Error al obtener roles' }, { status: 500 });
   }
 }
@@ -204,5 +210,43 @@ export async function DELETE(request) {
     return NextResponse.json({
       error: 'Error al eliminar rol: ' + error.message
     }, { status: 500 });
+  }
+}
+
+// Manejo de perfiles de usuario
+export async function PUTProfile(req) {
+  const { user, data } = await req.json();
+  
+  try {
+    const connection = await pool.getConnection();
+    
+    // Construir la consulta de actualización dinámica
+    const campos = Object.keys(data);
+    const valores = Object.values(data);
+    
+    const setClause = campos.map(campo => `${campo} = ?`).join(', ');
+    
+    await connection.query(
+      `UPDATE usuarios SET ${setClause} WHERE email = ?`,
+      [...valores, user.email]
+    );
+    
+    connection.release();
+    
+    // Registrar actividad
+    await logActividad(
+      user.email,
+      'Actualización de perfil',
+      `Campos actualizados: ${campos.join(', ')}`
+    );
+    
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    await logActividad(
+      user.email, 
+      'Error al actualizar perfil', 
+      error.message
+    );
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
