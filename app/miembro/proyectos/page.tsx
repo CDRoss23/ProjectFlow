@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import Sliderbar from '../componentes/sliderbar';
+import Sliderbar from '../../componentes/sliderbar';
 import {
     DndContext,
     closestCorners,
