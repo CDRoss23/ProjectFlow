@@ -48,7 +48,7 @@ const Sidebar = () => {
     ],
     miembro: [
       { href: "/dashboard", icon: <AiOutlineDashboard size={24} />, label: "Dashboard" },
-      { href: "/miembro/proyectos", icon: <AiOutlineProject size={24} />, label: "Proyectos" },
+      { href: "/miembro", icon: <AiOutlineProject size={24} />, label: "Proyectos" },
     ],
   };
 
