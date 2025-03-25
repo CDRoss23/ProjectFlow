@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1:3306
--- Tiempo de generación: 19-03-2025 a las 17:25:21
+-- Tiempo de generación: 25-03-2025 a las 21:38:07
 -- Versión del servidor: 8.3.0
 -- Versión de PHP: 8.2.18
 
@@ -20,36 +20,34 @@ SET time_zone = "+00:00";
 --
 -- Base de datos: `proyectflow`
 --
-CREATE DATABASE IF NOT EXISTS `proyectflow` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
-USE `proyectflow`;
 
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `usuarios`
+-- Estructura de tabla para la tabla `logs_sistema`
 --
 
-DROP TABLE IF EXISTS `usuarios`;
-CREATE TABLE IF NOT EXISTS `usuarios` (
+DROP TABLE IF EXISTS `logs_sistema`;
+CREATE TABLE IF NOT EXISTS `logs_sistema` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `nombre` varchar(100) NOT NULL,
-  `email` varchar(100) NOT NULL,
-  `contraseña` varchar(255) NOT NULL,
-  `rol` enum('admin','gerente','miembro') NOT NULL,
-  `fecha_registro` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `fecha` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `mensaje` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `nivel` enum('info','warning','error','critical') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'info',
+  `origen` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `usuario_id` int DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `email` (`email`)
-) ENGINE=MyISAM AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  KEY `idx_fecha` (`fecha`),
+  KEY `idx_nivel` (`nivel`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Volcado de datos para la tabla `usuarios`
+-- Volcado de datos para la tabla `logs_sistema`
 --
 
-INSERT INTO `usuarios` (`id`, `nombre`, `email`, `contraseña`, `rol`, `fecha_registro`) VALUES
-(1, 'Carlos Admin', 'carlos.admin@example.com', 'password123', 'admin', '2025-03-19 15:51:46'),
-(2, 'Ana Gerente', 'ana.gerente@example.com', 'password456', 'gerente', '2025-03-19 15:51:46'),
-(3, 'Luis Miembro', 'luis.miembro@example.com', 'password789', 'miembro', '2025-03-19 15:51:46'),
-(4, 'Antonio juan pretronilo', 'Aqui@primeraPrueba.com', '12345678', 'miembro', '2025-03-19 16:00:03');
+INSERT INTO `logs_sistema` (`id`, `fecha`, `mensaje`, `nivel`, `origen`, `usuario_id`) VALUES
+(1, '2025-03-25 14:16:53', 'Sistema iniciado correctamente', 'info', 'Sistema', NULL),
+(2, '2025-03-25 14:16:53', 'Base de datos conectada', 'info', 'Database', NULL),
+(3, '2025-03-25 14:16:53', 'Panel de mantenimiento cargado', 'info', 'Mantenimiento', NULL);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
