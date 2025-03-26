@@ -19,6 +19,7 @@ SET time_zone = "+00:00";
 
 --
 -- Base de datos: `proyectflow`
+
 --
 
 -- --------------------------------------------------------
@@ -53,3 +54,26 @@ COMMIT;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+
+
+DROP TABLE IF EXISTS `tareas`;
+CREATE TABLE IF NOT EXISTS `tareas`(
+  `id` int(11) NOT NULL,
+  `nombreProyecto` varchar(100) NOT NULL,
+  `descripcion` text DEFAULT NULL,
+  `fechaInicio` date DEFAULT NULL,
+  `fechaFin` date DEFAULT NULL,
+  `creadoPor` varchar(50) NOT NULL,
+  `estado` enum('pendiente','en_progreso','completada') DEFAULT 'pendiente',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+INSERT INTO `tareas` (`id`, `nombreProyecto`, `descripcion`, `fechaInicio`, `fechaFin`, `creadoPor`, `estado`, `created_at`) VALUES
+(1, 'login', 'login consumiendo api de google', '2025-03-27', '2025-04-04', '', 'pendiente', '2025-03-26 05:24:35');
+
+ALTER TABLE `tareas`
+  ADD PRIMARY KEY (`id`);
+
+ALTER TABLE `tareas`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+COMMIT;
