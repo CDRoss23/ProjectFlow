@@ -17,9 +17,10 @@ export async function GET() {
 export async function POST(request: Request) {
     try {
         const body = await request.json();
-        const { nombreProyecto, descripcion, fechaInicio, fechaFin, creadoPor, estado } = body;
+        const { nombreProyecto, descripcion, fechaInicio, fechaFin, estado } = body;
+        const storedUser = request.headers.get('x-user-email') || '';
 
-        if (!nombreProyecto || !descripcion || !fechaInicio || !fechaFin || !creadoPor) {
+        if (!nombreProyecto || !descripcion || !fechaInicio || !fechaFin) {
             return NextResponse.json({ 
                 error: 'Todos los campos son obligatorios' 
             }, { status: 400 });
@@ -27,7 +28,7 @@ export async function POST(request: Request) {
 
         const [result] = await pool.query(
             'INSERT INTO tareas (nombreProyecto, descripcion, fechaInicio, fechaFin, creadoPor, estado) VALUES (?, ?, ?, ?, ?, ?)',
-            [nombreProyecto, descripcion, fechaInicio, fechaFin, creadoPor, estado || 'pendiente']
+            [nombreProyecto, descripcion, fechaInicio, fechaFin, storedUser, estado || 'pendiente']
         );
 
         return NextResponse.json({ 
@@ -64,7 +65,7 @@ export async function PUT(request: Request) {
             }, { status: 404 });
         }
 
-        const [updatedRows] = await pool.query('SELECT * FROM tareas WHERE id = ?', [id]);
+        const [updatedRows] = await pool.query('SELECT * FROM tareas WHERE id = ?', [id]) as [Array<{ id: number; nombreProyecto: string; descripcion: string; fechaInicio: string; fechaFin: string; creadoPor: string; estado: string }>, any];
         return NextResponse.json(updatedRows[0]);
     } catch (error) {
         console.error('Error updating task:', error);

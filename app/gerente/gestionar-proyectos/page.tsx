@@ -60,13 +60,20 @@ export default function Gestionar() {
         setIsLoading(true);
 
         try {
+            const storedUser = localStorage.getItem('userEmail'); // Obtener el email del usuario del localStorage
             const url = editando ? `/api/tareas/${formData.id}` : '/api/tareas';
             const method = editando ? 'PUT' : 'POST';
 
             const response = await fetch(url, {
                 method,
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(formData),
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'x-user-email': storedUser || '' // Agregar el email en los headers
+                },
+                body: JSON.stringify({
+                    ...formData,
+                    creadoPor: storedUser // Incluir el creador en los datos del formulario
+                }),
             });
 
             if (!response.ok) {
