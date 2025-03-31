@@ -1,5 +1,6 @@
 'use client'
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import emailjs from '@emailjs/browser';
 import Sliderbar from '../../componentes/sliderbar';
 
 function Comunicacion() {
@@ -10,28 +11,50 @@ function Comunicacion() {
     });
     const [status, setStatus] = useState('');
 
+    useEffect(() => {
+        const initEmailJS = () => { 
+            try {
+                if (!process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY) {
+                    throw new Error('EmailJS public key no encontrada');
+                }
+                emailjs.init(process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY);
+                console.log('EmailJS inicializado correctamente');
+            } catch (error) {
+                console.error('Error al inicializar EmailJS:', error);
+            }
+        };
+
+        initEmailJS();
+    }, []);
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setStatus('Enviando...');
 
         try {
-            const response = await fetch('/api/send', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(formData),
-            });
+            const templateParams = {
+                subject: formData.asunto,
+                name: "Projectflow",
+                message: formData.mensaje,
+                to_email: formData.destinatario,
+            };
 
-            const data = await response.json();
-            if (data.error) {
-                setStatus('Error al enviar el mensaje');
-            } else {
+            const result = await emailjs.send(
+                "service_yye61p5",
+                "template_v2a1w25",
+                templateParams,
+                process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY
+            );
+
+            if (result.text === "OK") {
                 setStatus('Mensaje enviado con éxito');
                 setFormData({ destinatario: '', asunto: '', mensaje: '' });
+            } else {
+                setStatus('Error al enviar el mensaje');
             }
-        } catch (error) {
-            setStatus('Error al enviar el mensaje');
+        } catch (error: any) {
+            console.error('Error al enviar email:', error);
+            setStatus(error.message || 'Error al enviar el mensaje');
         }
     };
 
