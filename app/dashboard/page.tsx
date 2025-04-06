@@ -1,111 +1,94 @@
-"use client";
+import React from 'react';
+import Sliderbar from '../componentes/sliderbar';
+import { FaUsers, FaTasks, FaProjectDiagram, FaClock } from 'react-icons/fa';
 
-import React, { useState, useEffect } from "react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import {
-  AiOutlineProject,
-  AiOutlineTeam,
-  AiOutlineSetting,
-  AiOutlineUser,
-  AiOutlineDashboard,
-  AiOutlineLogout,
-} from "react-icons/ai";
-
-const Sidebar = () => {
-  const [isOpen, setIsOpen] = useState(true);
-  const [currentRole, setCurrentRole] = useState<string | null>(null);
-  const router = useRouter();
-
-  useEffect(() => {
-    const storedUser = JSON.parse(sessionStorage.getItem("user") || "null");
-    if (!storedUser || !storedUser.rol) {
-      router.push("/login");
-    } else {
-      setCurrentRole(storedUser.rol);
-    }
-  }, [router]);
-
-  const handleLogout = () => {
-    sessionStorage.removeItem("user");
-    router.push("/login");
-  };
-
-  const menuItems = {
-    admin: [
-      { href: "/dashboard", icon: <AiOutlineDashboard size={24} />, label: "Dashboard" },
-      { href: "/admin/gestionar-usuarios", icon: <AiOutlineUser size={24} />, label: "Gestionar Usuarios" },
-      { href: "/admin/confi-roles", icon: <AiOutlineTeam size={24} />, label: "Configurar Permisos" },
-      { href: "/admin/actividad", icon: <AiOutlineUser size={24} />, label: "Supervisar Actividad" },
-      { href: "/admin/mantenimiento", icon: <AiOutlineSetting size={24} />, label: "Mantenimiento" },
-    ],
-    gerente: [
-      { href: "/dashboard", icon: <AiOutlineDashboard size={24} />, label: "Dashboard" },
-      { href: "/gerente/gestionar-proyectos", icon: <AiOutlineProject size={24} />, label: "Gestionar Proyectos" },
-      { href: "/gerente/proceso", icon: <AiOutlineTeam size={24} />, label: "Supervisar Proyecto" },
-      { href: "/gerente/comunicacion", icon: <AiOutlineTeam size={24} />, label: "Comunicación" },
-    ],
-    miembro: [
-      { href: "/dashboard", icon: <AiOutlineDashboard size={24} />, label: "Dashboard" },
-      { href: "/miembro/proyectos", icon: <AiOutlineProject size={24} />, label: "Proyectos" },
-    ],
-  };
-
-  const roleText = {
-    admin: "Administrador",
-    gerente: "Gerencia",
-    miembro: "Miembro",
-  };
-
-  // Verifica si currentRole es válido
-  if (!currentRole || !menuItems[currentRole as keyof typeof menuItems]) {
-    return null; // No renderiza si el rol no es válido
-  }
-
+function Dashboard() {
   return (
-    <div className={`bg-gray-800 text-white h-screen ${isOpen ? "w-64" : "w-20"} transition-all duration-300 fixed left-0 top-0`}>
-      <div className="p-4">
-        <div className="flex items-center justify-between p-4 border-b border-gray-600">
-          {isOpen && (
-            <Link href="/" className="flex items-center cursor-pointer">
-              <h1 className="text-2xl font-bold text-white">ProjectFlow</h1>
-            </Link>
-          )}
-          <button onClick={() => setIsOpen(!isOpen)} className="p-2 rounded-lg hover:bg-gray-700">
-            ☰
-          </button>
-        </div>
-
-        {isOpen && currentRole && (
-          <div className="mt-4 text-center border-b border-gray-500 pb-4">
-            <p className="text-white text-lg font-semibold">
-              {roleText[currentRole as keyof typeof roleText]}
-            </p>
+    <div className="flex min-h-screen bg-gradient-to-b from-black to-gray-900 text-white">
+            <div className="fixed left-0 h-full">
+                <Sliderbar />
+            </div>
+        
+        <main className="flex-1 p-8">
+          <h1 className="text-3xl font-bold mb-8">Panel de Control</h1>
+          
+          {/* Tarjetas de estadísticas */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div className="bg-gray-800 p-6 rounded-lg">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-gray-400">Proyectos Activos</p>
+                  <h3 className="text-2xl font-bold">12</h3>
+                </div>
+                <FaProjectDiagram className="text-blue-500 text-3xl" />
+              </div>
+            </div>
+            
+            <div className="bg-gray-800 p-6 rounded-lg">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-gray-400">Tareas Pendientes</p>
+                  <h3 className="text-2xl font-bold">24</h3>
+                </div>
+                <FaTasks className="text-green-500 text-3xl" />
+              </div>
+            </div>
+            
+            <div className="bg-gray-800 p-6 rounded-lg">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-gray-400">Miembros del Equipo</p>
+                  <h3 className="text-2xl font-bold">8</h3>
+                </div>
+                <FaUsers className="text-purple-500 text-3xl" />
+              </div>
+            </div>
+            
+            <div className="bg-gray-800 p-6 rounded-lg">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-gray-400">Horas Registradas</p>
+                  <h3 className="text-2xl font-bold">164</h3>
+                </div>
+                <FaClock className="text-yellow-500 text-3xl" />
+              </div>
+            </div>
           </div>
-        )}
 
-        <nav className="mt-8">
-          <ul className="space-y-4">
-            {menuItems[currentRole as keyof typeof menuItems]?.map((item, index) => (
-              <li key={index}>
-                <Link href={item.href} className="flex items-center gap-4 p-2 rounded-lg hover:bg-gray-700">
-                  {item.icon}
-                  {isOpen && <span>{item.label}</span>}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </nav>
-
-        <div className="absolute bottom-4 left-0 w-full">
-          <button onClick={handleLogout} className="flex items-center gap-4 p-2 w-full text-left hover:bg-red-600 rounded-lg">
-            <AiOutlineLogout size={24} />
-            {isOpen && <span>Cerrar Sesión</span>}
-          </button>
-        </div>
+          {/* Sección de proyectos recientes */}
+          <div className="bg-gray-800 rounded-lg p-6 mb-8">
+            <h2 className="text-xl font-semibold mb-4">Proyectos Recientes</h2>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="text-gray-400 border-b border-gray-700">
+                    <th className="text-left pb-3">Nombre</th>
+                    <th className="text-left pb-3">Estado</th>
+                    <th className="text-left pb-3">Progreso</th>
+                    <th className="text-left pb-3">Fecha límite</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr className="border-b border-gray-700">
+                    <td className="py-3">Diseño UI/UX</td>
+                    <td><span className="bg-green-500/20 text-green-500 px-2 py-1 rounded">Activo</span></td>
+                    <td>75%</td>
+                    <td>15 Abril 2024</td>
+                  </tr>
+                  <tr className="border-b border-gray-700">
+                    <td className="py-3">Desarrollo Backend</td>
+                    <td><span className="bg-yellow-500/20 text-yellow-500 px-2 py-1 rounded">En proceso</span></td>
+                    <td>45%</td>
+                    <td>22 Abril 2024</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </main>
       </div>
-    </div>
   );
-};
+}
 
-export default Sidebar;
+export default Dashboard;
+
