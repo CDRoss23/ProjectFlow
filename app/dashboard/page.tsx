@@ -4,12 +4,15 @@ import { FaUsers, FaTasks, FaProjectDiagram, FaClock } from 'react-icons/fa';
 
 function Dashboard() {
   return (
-    <div className="flex min-h-screen bg-gradient-to-b from-black to-gray-900 text-white">
-            <div className="fixed left-0 h-full">
-                <Sliderbar />
-            </div>
-        
-        <main className="flex-1 p-8">
+    <div className="flex">
+      {/* Sidebar fijo a la izquierda */}
+      <div className="fixed inset-y-0 left-0">
+        <Sliderbar />
+      </div>
+
+      {/* Contenido principal con margen izquierdo para el sidebar */}
+      <div className="flex-1 min-h-screen bg-gradient-to-b from-black to-gray-900 text-white ml-64">
+        <main className="p-8">
           <h1 className="text-3xl font-bold mb-8">Panel de Control</h1>
           
           {/* Tarjetas de estadísticas */}
@@ -87,6 +90,7 @@ function Dashboard() {
           </div>
         </main>
       </div>
+    </div>
   );
 }
 
