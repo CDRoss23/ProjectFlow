@@ -1,3 +1,23 @@
+Integrantes:
+
+
+
+Arístides Alexander Hernández Valdez -- HV241964
+
+Jefferson Steven Velasco Álvarez -- VA242207
+
+Rossman Antonio Cabrera Dávila -- CD240690
+
+Nelson Jose Almendares Ruiz -- AR230429
+
+Jorge Alberto Díaz Duran -- DD242312
+
+
+
+
+
+
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started

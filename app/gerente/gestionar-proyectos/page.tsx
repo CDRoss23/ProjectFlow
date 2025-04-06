@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Sliderbar from '../../componentes/sliderbar';
 
 interface Tarea {
-    id: number;
+    id?: number;
     nombreProyecto: string;
     descripcion: string;
     fechaInicio: string;
@@ -15,17 +15,17 @@ interface Tarea {
 
 export default function Gestionar() {
     const [tareas, setTareas] = useState<Tarea[]>([]);
-    const [formData, setFormData] = useState<Omit<Tarea, 'id' | 'creadoPor'>>({
+    const [formData, setFormData] = useState<Tarea>({
         nombreProyecto: '',
         descripcion: '',
         fechaInicio: '',
         fechaFin: '',
+        creadoPor: '',
         estado: 'pendiente',
     });
-    const [editando, setEditando] = useState<boolean>(false);
-    const [tareaId, setTareaId] = useState<number | null>(null);
-    const [isLoading, setIsLoading] = useState<boolean>(false);
-    const [error, setError] = useState<string>('');
+    const [editando, setEditando] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState('');
 
     useEffect(() => {
         obtenerTareas();
@@ -36,11 +36,12 @@ export default function Gestionar() {
         try {
             const response = await fetch('/api/tareas');
             if (!response.ok) throw new Error('Error al obtener tareas');
-            setTareas(await response.json());
+            const data = await response.json();
+            setTareas(data);
             setError('');
         } catch (err) {
             setError('Error al cargar tareas');
-            console.error(err);
+            console.error('Error:', err);
         } finally {
             setIsLoading(false);
         }
@@ -48,7 +49,10 @@ export default function Gestionar() {
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
+        setFormData(prev => ({
+            ...prev,
+            [name]: value,
+        }));
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -56,38 +60,41 @@ export default function Gestionar() {
         setIsLoading(true);
 
         try {
-            const storedUser = localStorage.getItem('userEmail') || '';
-            const url = editando ? `/api/tareas/${tareaId}` : '/api/tareas';
+            const storedUser = localStorage.getItem('userEmail'); // Obtener el email del usuario del localStorage
+            const url = editando ? `/api/tareas/${formData.id}` : '/api/tareas';
             const method = editando ? 'PUT' : 'POST';
 
             const response = await fetch(url, {
                 method,
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ ...formData, creadoPor: storedUser }),
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'x-user-email': storedUser || '' // Agregar el email en los headers
+                },
+                body: JSON.stringify({
+                    ...formData,
+                    creadoPor: storedUser // Incluir el creador en los datos del formulario
+                }),
             });
 
-            if (!response.ok) throw new Error('Error al guardar tarea');
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Error al guardar tarea');
+            }
 
             await obtenerTareas();
             resetForm();
+            setError('');
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Error desconocido');
-            console.error(err);
+            console.error('Error:', err);
         } finally {
             setIsLoading(false);
         }
     };
 
     const handleEditar = (tarea: Tarea) => {
-        setFormData({
-            nombreProyecto: tarea.nombreProyecto,
-            descripcion: tarea.descripcion,
-            fechaInicio: tarea.fechaInicio,
-            fechaFin: tarea.fechaFin,
-            estado: tarea.estado,
-        });
+        setFormData(tarea);
         setEditando(true);
-        setTareaId(tarea.id);
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
@@ -96,13 +103,21 @@ export default function Gestionar() {
         setIsLoading(true);
 
         try {
-            const response = await fetch(`/api/tareas/${id}`, { method: 'DELETE' });
-            if (!response.ok) throw new Error('Error al eliminar tarea');
+            const response = await fetch(`/api/tareas/${id}`, {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Error al eliminar tarea');
+            }
 
             await obtenerTareas();
+            setError('');
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Error desconocido');
-            console.error(err);
+            console.error('Error:', err);
         } finally {
             setIsLoading(false);
         }
@@ -114,10 +129,10 @@ export default function Gestionar() {
             descripcion: '',
             fechaInicio: '',
             fechaFin: '',
+            creadoPor: '',
             estado: 'pendiente',
         });
         setEditando(false);
-        setTareaId(null);
     };
 
     return (
@@ -133,47 +148,52 @@ export default function Gestionar() {
                         {editando ? 'Editar Proyecto' : 'Crear Nuevo Proyecto'}
                     </h2>
                     <form className="space-y-4" onSubmit={handleSubmit}>
-                        <input
-                            type="text"
-                            name="nombreProyecto"
-                            value={formData.nombreProyecto}
-                            onChange={handleInputChange}
-                            placeholder="Nombre del Proyecto"
-                            className="w-full bg-gray-700 p-2 rounded"
-                            required
-                        />
-                        <textarea
-                            name="descripcion"
-                            value={formData.descripcion}
-                            onChange={handleInputChange}
-                            placeholder="Descripción"
-                            className="w-full bg-gray-700 p-2 rounded h-24"
-                            required
-                        />
+                        <div>
+                            <label className="block mb-2">Nombre del Proyecto</label>
+                            <input
+                                type="text"
+                                name="nombreProyecto"
+                                value={formData.nombreProyecto}
+                                onChange={handleInputChange}
+                                className="w-full bg-gray-700 p-2 rounded"
+                            />
+                        </div>
+                        <div>
+                            <label className="block mb-2">Descripción</label>
+                            <textarea
+                                name="descripcion"
+                                value={formData.descripcion}
+                                onChange={handleInputChange}
+                                className="w-full bg-gray-700 p-2 rounded h-24"
+                            ></textarea>
+                        </div>
                         <div className="grid grid-cols-2 gap-4">
-                            <input
-                                type="date"
-                                name="fechaInicio"
-                                value={formData.fechaInicio}
-                                onChange={handleInputChange}
-                                className="w-full bg-gray-700 p-2 rounded"
-                                required
-                            />
-                            <input
-                                type="date"
-                                name="fechaFin"
-                                value={formData.fechaFin}
-                                onChange={handleInputChange}
-                                className="w-full bg-gray-700 p-2 rounded"
-                                required
-                            />
+                            <div>
+                                <label className="block mb-2">Fecha de Inicio</label>
+                                <input
+                                    type="date"
+                                    name="fechaInicio"
+                                    value={formData.fechaInicio}
+                                    onChange={handleInputChange}
+                                    className="w-full bg-gray-700 p-2 rounded"
+                                />
+                            </div>
+                            <div>
+                                <label className="block mb-2">Fecha de Finalización</label>
+                                <input
+                                    type="date"
+                                    name="fechaFin"
+                                    value={formData.fechaFin}
+                                    onChange={handleInputChange}
+                                    className="w-full bg-gray-700 p-2 rounded"
+                                />
+                            </div>
                         </div>
                         <button
                             type="submit"
                             className="w-full bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded"
-                            disabled={isLoading}
                         >
-                            {isLoading ? 'Guardando...' : editando ? 'Guardar Cambios' : 'Crear Proyecto'}
+                            {editando ? 'Guardar Cambios' : 'Crear Proyecto'}
                         </button>
                     </form>
                 </div>
@@ -206,7 +226,7 @@ export default function Gestionar() {
                                             Editar
                                         </button>
                                         <button
-                                            onClick={() => handleEliminar(tarea.id)}
+                                            onClick={() => handleEliminar(tarea.id!)}
                                             className="bg-red-600 hover:bg-red-700 px-3 py-1 rounded"
                                         >
                                             Eliminar
